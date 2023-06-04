@@ -39,6 +39,8 @@ static interpret_result_t run() {
         break;
       }
 
+      case OP_NEGATE: push(-pop()); break;
+
       case OP_RETURN: {
         print_value(pop());
         printf("\n");
