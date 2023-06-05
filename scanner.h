@@ -1,7 +1,7 @@
 #ifndef yapl_scanner_h
 #define yapl_scanner_h
 
-typedef enum
+typedef enum token_type_t
 {
   // Single-character tokens.
   TOKEN_LEFT_PAREN,
@@ -50,7 +50,7 @@ typedef enum
   TOKEN_EOF
 } token_type_t;
 
-typedef struct
+typedef struct token_t
 {
   token_type_t type;
   const char *start;

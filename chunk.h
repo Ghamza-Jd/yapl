@@ -4,7 +4,7 @@
 #include "common.h"
 #include "value.h"
 
-typedef enum
+typedef enum op_code_t
 {
   OP_CONSTANT,
   OP_ADD,
@@ -15,7 +15,7 @@ typedef enum
   OP_RETURN,
 } op_code_t;
 
-typedef struct
+typedef struct chunk_t
 {
   int count;
   int capacity;

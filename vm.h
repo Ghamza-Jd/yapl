@@ -6,7 +6,7 @@
 
 #define STACK_MAX 256
 
-typedef struct
+typedef struct vm_t
 {
   chunk_t *chunk;
   uint8_t *ip;
@@ -14,7 +14,7 @@ typedef struct
   value_t *stack_top;
 } vm_t;
 
-typedef enum
+typedef enum interpret_result_t
 {
   INTERPRET_OK,
   INTERPRET_COMPILE_ERROR,
