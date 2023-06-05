@@ -32,7 +32,7 @@ static void error_at(token_t *token, const char *message)
   }
   else
   {
-    fprintf(stderr, "at '%.*s'", token->length, token->start);
+    fprintf(stderr, " at '%.*s'", token->length, token->start);
   }
 
   fprintf(stderr, ": %s\n", message);
@@ -47,17 +47,6 @@ static void error(const char *message)
 static void error_at_current(const char *message)
 {
   error_at(&parser.current, message);
-}
-
-bool compile(const char *source, chunk_t *chunk)
-{
-  init_scanner(source);
-  parser.had_error = false;
-  parser.panic_mode = false;
-  advance();
-  expression();
-  consume(TOKEN_EOF, "Expect end of expression.");
-  return !parser.had_error;
 }
 
 static void advance()
@@ -83,4 +72,17 @@ static void consume(token_type_t type, const char *message)
   }
 
   error_at_current(message);
+}
+
+void expression() {}
+
+bool compile(const char *source, chunk_t *chunk)
+{
+  init_scanner(source);
+  parser.had_error = false;
+  parser.panic_mode = false;
+  advance();
+  expression();
+  consume(TOKEN_EOF, "Expect end of expression.");
+  return !parser.had_error;
 }
