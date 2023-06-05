@@ -20,6 +20,11 @@ void init_scanner(const char *source)
   scanner.line = 1;
 }
 
+static bool is_digit(char c)
+{
+  return c >= '0' && c <= '9';
+}
+
 static bool is_at_end()
 {
   return *scanner.current == '\0';
@@ -95,6 +100,38 @@ static void skip_whitespace()
   }
 }
 
+static token_t handle_number()
+{
+  while (is_digit(peek()))
+    advance();
+
+  if (peek() == '.' && is_digit(peek_next()))
+  {
+    advance();
+
+    while (is_digit(peek()))
+      advance();
+  }
+
+  return make_token(TOKEN_NUMBER);
+}
+
+static token_t handle_string()
+{
+  while (peek() != '"' && !is_at_end())
+  {
+    if (peek() == '\n')
+      scanner.line++;
+    advance();
+  }
+
+  if (is_at_end())
+    return error_token("Unterminated string.");
+
+  advance();
+  return make_token(TOKEN_STRING);
+}
+
 token_t scan_token()
 {
   skip_whitespace();
@@ -104,6 +141,8 @@ token_t scan_token()
     return make_token(TOKEN_EOF);
 
   char c = advance();
+  if (is_digit(c))
+    return handle_number();
 
   switch (c)
   {
@@ -145,6 +184,8 @@ token_t scan_token()
   case '>':
     return make_token(
         match('=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
+  case '"':
+    return handle_string();
   }
 
   return error_token("Unexpected character.");
