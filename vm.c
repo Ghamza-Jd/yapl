@@ -1,31 +1,43 @@
 #include <stdio.h>
 
 #include "common.h"
+#include "compiler.h"
 #include "debug.h"
 #include "vm.h"
 
 vm_t vm;
 
-static void reset_stack() {
+static void reset_stack()
+{
   vm.stack_top = vm.stack;
 }
 
-void init_vm() {
+void init_vm()
+{
   reset_stack();
 }
 
-void free_vm() { }
+void free_vm() {}
 
-static interpret_result_t run() {
+static interpret_result_t run()
+{
 #define READ_BYTE() (*vm.ip++)
 #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
-#define BINARY_OP(op) do { value_t b = pop(); value_t a = pop(); push(a op b); } while (false)
+#define BINARY_OP(op)  \
+  do                   \
+  {                    \
+    value_t b = pop(); \
+    value_t a = pop(); \
+    push(a op b);      \
+  } while (false)
 
-  for (;;) {
+  for (;;)
+  {
 #ifdef DEBUG_TRACE_EXECUTION
     disassemble_instruction(vm.chunk, (int)(vm.ip - vm.chunk->code));
     printf("          ");
-    for (value_t* slot = vm.stack; slot < vm.stack_top; slot++) {
+    for (value_t *slot = vm.stack; slot < vm.stack_top; slot++)
+    {
       printf("[ ");
       print_value(*slot);
       printf(" ]");
@@ -33,24 +45,37 @@ static interpret_result_t run() {
     printf("\n");
 #endif
     uint8_t instruction;
-    switch (instruction = READ_BYTE()) {
-      case OP_CONSTANT: {
-        value_t constant = READ_CONSTANT();
-        push(constant);
-        break;
-      }
+    switch (instruction = READ_BYTE())
+    {
+    case OP_CONSTANT:
+    {
+      value_t constant = READ_CONSTANT();
+      push(constant);
+      break;
+    }
 
-      case OP_ADD:      BINARY_OP(+); break;
-      case OP_SUBTRACT: BINARY_OP(-); break;
-      case OP_MULTIPLY: BINARY_OP(*); break;
-      case OP_DIVIDE:   BINARY_OP(/); break;
-      case OP_NEGATE:   push(-pop()); break;
+    case OP_ADD:
+      BINARY_OP(+);
+      break;
+    case OP_SUBTRACT:
+      BINARY_OP(-);
+      break;
+    case OP_MULTIPLY:
+      BINARY_OP(*);
+      break;
+    case OP_DIVIDE:
+      BINARY_OP(/);
+      break;
+    case OP_NEGATE:
+      push(-pop());
+      break;
 
-      case OP_RETURN: {
-        print_value(pop());
-        printf("\n");
-        return INTERPRET_OK;
-      }
+    case OP_RETURN:
+    {
+      print_value(pop());
+      printf("\n");
+      return INTERPRET_OK;
+    }
     }
   }
 
@@ -59,18 +84,20 @@ static interpret_result_t run() {
 #undef BINARY_OP
 }
 
-interpret_result_t interpret(chunk_t* chunk) {
-  vm.chunk = chunk;
-  vm.ip = vm.chunk->code;
-  return run();
+interpret_result_t interpret(const char *source)
+{
+  compile(source);
+  return INTERPRET_OK;
 }
 
-void push(value_t value) {
+void push(value_t value)
+{
   *vm.stack_top = value;
   vm.stack_top++;
 }
 
-value_t pop() {
+value_t pop()
+{
   vm.stack_top--;
   return *vm.stack_top;
 }
