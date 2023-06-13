@@ -6,10 +6,10 @@ all: compile run
 
 compile:
 	@mkdir -p build
-	@gcc -o build/${prog_name} *.c -I ./
+	@gcc -o build/$(prog_name) *.c -I ./
 
 run:
-	@./build/${prog_name}
+	@./build/$(prog_name)
 
 clean:
 	@rm -rf ./build
